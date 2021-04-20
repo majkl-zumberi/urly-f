@@ -1,31 +1,43 @@
 /*eslint-disable*/
 import Footer from "components/Footers/Footer.js";
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
-import React, { useEffect } from 'react'
-import {useLocation} from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import http from "../http/http";
 
 export default function Index() {
+  const isAuthenticated = !!sessionStorage.getItem("userSession");
   const location = useLocation();
     useEffect(() => {
       !!location?.state?.detail && setError({failure:true,message:location.state.detail})
    }, [location]);
   const [Error,setError]= React.useState({failure:false,message:''});
-  const [state,setState]= React.useState({url:'',shortened:false});
+  const [state,setState]= React.useState({url:'',slug:'',shortened:false});
   const [copySuccess, setCopySuccess] = React.useState(false);
   const urlInputRef = React.useRef(null);
+  const slugInputRef = React.useRef(null);
   const handleChange = event => {
-    setState({
-        shortened:false,
-        url:event.target.value
+    setState(prevState=>{
+        return {
+          ...prevState,
+          shortened:false,
+          [event.target.name]:event.target.value
+        }
       });
   };
   const shorten= async ()=>{
     try{
-      const {data}= await http.post("/short-url",{
-        fullurl:state.url
-      });
-      console.log({data});
+      // const {data}= await http.post("/short-url",{
+      //   fullurl:state.url
+      // });
+      const promise = !isAuthenticated
+       ? 
+       http.post("/short-url",{fullurl:state.url})
+       :
+       http.post("/short-url/slug",{fullurl:state.url,slug:state.slug},{
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('userSession')}` }
+       })
+      const {data} = await promise;
       setState({url:`${process.env.REACT_APP_PROJECTURL}/${data.shortUrl}`,shortened:true})
     } catch (e){
       setError({failure:true,message:e.response.data.errorMessage})
@@ -89,9 +101,19 @@ export default function Index() {
                 className="border-0 px-3 py-3 placeholder-LightBlue-800 text-LightBlue-600 bg-white rounded text-sm shadow w-full focus:outline-none focus:ring  ease-linear transition-all duration-150"
                 placeholder="inserisci un super url"
                 ref={urlInputRef}
+                name="url"
                 value={state.url}
                 onChange={handleChange}
                     />
+              {isAuthenticated && (<input 
+                type="text"
+                name="slug"
+                ref={slugInputRef}
+                value={state.slug}
+                onChange={handleChange}
+                className="border-0 px-3 py-3 placeholder-LightBlue-800 text-LightBlue-600 bg-white rounded text-sm shadow w-2 focus:outline-none focus:ring  ease-linear transition-all duration-150"
+                placeholder="inserisci slug"
+                    />)}
               <button 
               class="px-3 py-3   rounded-r-lg text-white font-bold rounded-l-none rounded outline-none focus:outline-none mr-1 bg-lightBlue-500 active:bg-lightBlue-600 uppercase text-sm shadow hover:shadow-lg ease-linear transition-all duration-150"
               onClick={()=>state.shortened?copyToClipboard():shorten()}
@@ -101,20 +123,6 @@ export default function Index() {
               <div className="mt-12">
                 {renderSuccessIfShortened()}
                 {renderError()}
-                <a
-                  href="https://www.creative-tim.com/learning-lab/tailwind/react/overview/notus?ref=nr-index"
-                  target="_blank"
-                  className="get-started text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-1 bg-lightBlue-500 active:bg-lightBlue-600 uppercase text-sm shadow hover:shadow-lg ease-linear transition-all duration-150"
-                >
-                  Get started
-                </a>
-                <a
-                  href="https://github.com/creativetimofficial/notus-react?ref=nr-index"
-                  className="github-star ml-1 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-1 bg-blueGray-700 active:bg-blueGray-600 uppercase text-sm shadow hover:shadow-lg ease-linear transition-all duration-150"
-                  target="_blank"
-                >
-                  Github Star
-                </a>
               </div>
             </div>
           </div>
@@ -169,13 +177,10 @@ export default function Index() {
                     ></polygon>
                   </svg>
                   <h4 className="text-xl font-bold text-white">
-                    Great for your awesome project
+                    Accorcia, accorcia e accorcia ancora!
                   </h4>
                   <p className="text-md font-light mt-2 text-white">
-                    Putting together a page has never been easier than matching
-                    together pre-made components. From landing pages
-                    presentation to login areas, you can easily customise and
-                    built your pages.
+                  Gestisci i tuoi link in maniera semplice e veloce, non lasciare che i link ti limitino
                   </p>
                 </blockquote>
               </div>
@@ -187,28 +192,26 @@ export default function Index() {
                   <div className="relative flex flex-col mt-4">
                     <div className="px-4 py-5 flex-auto">
                       <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-white">
-                        <i className="fas fa-sitemap"></i>
+                        <i className="fas fa-shipping-fast"></i>
                       </div>
                       <h6 className="text-xl mb-1 font-semibold">
-                        CSS Components
+                        Facile e Veloce!
                       </h6>
                       <p className="mb-4 text-blueGray-500">
-                        Urly comes with a huge number of Fully Coded CSS
-                        components.
+                        Urly ti aiuta a creare con semplicità url davvero corti!
                       </p>
                     </div>
                   </div>
                   <div className="relative flex flex-col min-w-0">
                     <div className="px-4 py-5 flex-auto">
                       <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-white">
-                        <i className="fas fa-drafting-compass"></i>
+                        <i className="fas fa-user"></i>
                       </div>
                       <h6 className="text-xl mb-1 font-semibold">
-                        JavaScript Components
+                        Benefit con autenticazione
                       </h6>
                       <p className="mb-4 text-blueGray-500">
-                        We also feature many dynamic components for React,
-                        NextJS, Vue and Angular.
+                        Se effettuerai il login ti spettano gli slug, crea i tuoi url scegliendo tu la parola con cui accorciarla!
                       </p>
                     </div>
                   </div>
@@ -217,108 +220,29 @@ export default function Index() {
                   <div className="relative flex flex-col min-w-0 mt-4">
                     <div className="px-4 py-5 flex-auto">
                       <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-white">
-                        <i className="fas fa-newspaper"></i>
+                        <i className="fas fa-shield-alt"></i>
                       </div>
-                      <h6 className="text-xl mb-1 font-semibold">Pages</h6>
+                      <h6 className="text-xl mb-1 font-semibold">Sicuro</h6>
                       <p className="mb-4 text-blueGray-500">
-                        This extension also comes with 3 sample pages. They are
-                        fully coded so you can start working instantly.
+                        Urly è una piattaforma sicura, non condivide nessun dato ad altre terze parti
                       </p>
                     </div>
                   </div>
                   <div className="relative flex flex-col min-w-0">
                     <div className="px-4 py-5 flex-auto">
                       <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-white">
-                        <i className="fas fa-file-alt"></i>
+                        <i className="fas fa-key"></i>
                       </div>
                       <h6 className="text-xl mb-1 font-semibold">
-                        Documentation
+                        Accessi Illimitati
                       </h6>
                       <p className="mb-4 text-blueGray-500">
-                        Built by developers for developers. You will love how
-                        easy is to to work with Urly.
+                        I link che accorcerai non scadranno mai! accedi quando vuoi!
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-4 pb-32 pt-48">
-          <div className="items-center flex flex-wrap">
-            <div className="w-full md:w-5/12 ml-auto px-12 md:px-4">
-              <div className="md:pr-12">
-                <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-white">
-                  <i className="fas fa-file-alt text-xl"></i>
-                </div>
-                <h3 className="text-3xl font-semibold">
-                  Complex Documentation
-                </h3>
-                <p className="mt-4 text-lg leading-relaxed text-blueGray-500">
-                  This extension comes a lot of fully coded examples that help
-                  you get started faster. You can adjust the colors and also the
-                  programming language. You can change the text and images and
-                  you're good to go.
-                </p>
-                <ul className="list-none mt-6">
-                  <li className="py-2">
-                    <div className="flex items-center">
-                      <div>
-                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blueGray-500 bg-blueGray-50 mr-3">
-                          <i className="fas fa-fingerprint"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="text-blueGray-500">
-                          Built by Developers for Developers
-                        </h4>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="py-2">
-                    <div className="flex items-center">
-                      <div>
-                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blueGray-500 bg-blueGray-50 mr-3">
-                          <i className="fab fa-html5"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="text-blueGray-500">
-                          Carefully crafted code for Components
-                        </h4>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="py-2">
-                    <div className="flex items-center">
-                      <div>
-                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blueGray-500 bg-blueGray-50 mr-3">
-                          <i className="far fa-paper-plane"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="text-blueGray-500">
-                          Dynamic Javascript Components
-                        </h4>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="w-full md:w-6/12 mr-auto px-4 pt-24 md:pt-0">
-              <img
-                alt="..."
-                className="max-w-full rounded-lg shadow-xl"
-                style={{
-                  transform:
-                    "scale(1) perspective(1040px) rotateY(-11deg) rotateX(2deg) rotate(2deg)",
-                }}
-                src={require("assets/img/documentation.png").default}
-              />
             </div>
           </div>
         </div>
@@ -354,29 +278,18 @@ export default function Index() {
                 </span>
               </p>
               <h3 className="font-semibold text-3xl">
-                Do you love this Starter Kit?
+                Ti piace urly?
               </h3>
               <p className="text-blueGray-500 text-lg leading-relaxed mt-4 mb-4">
-                Cause if you do, it can be yours now. Hit the buttons below to
-                navigate to get the Free version for your next project. Build a
-                new web app or give an old project a new look!
+                supporta lo sviluppatore con un buon caffe!  
+                <span role="img" aria-label="support">
+                  ☕
+                </span>
               </p>
               <div className="sm:block flex flex-col mt-10">
-                <a
-                  href="https://www.creative-tim.com/learning-lab/tailwind/react/overview/notus?ref=nr-index"
-                  target="_blank"
-                  className="get-started text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-lightBlue-500 active:bg-lightBlue-600 uppercase text-sm shadow hover:shadow-lg ease-linear transition-all duration-150"
-                >
-                  Get started
-                </a>
-                <a
-                  href="https://github.com/creativetimofficial/notus-react?ref=nr-index"
-                  target="_blank"
-                  className="github-star sm:ml-1 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-1 bg-blueGray-700 active:bg-blueGray-600 uppercase text-sm shadow hover:shadow-lg"
-                >
-                  <i className="fab fa-github text-lg mr-1"></i>
-                  <span>Help With a Star</span>
-                </a>
+              <p className="text-blueGray-500 text-lg leading-relaxed mt-4 mb-4">
+                Coming soon..
+              </p>
               </div>
               <div className="text-center mt-16"></div>
             </div>

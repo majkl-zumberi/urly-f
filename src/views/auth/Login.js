@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import http from '../../http/http';
 export default function Login() {
@@ -103,17 +103,13 @@ export default function Login() {
                     >
                       Accedi
                     </button>
-                    
+                    <div className="text-blueGray-700 text-center mt-3 mb-2 font-bold">
+                    <Link to="/auth/register">
+                     <small>Oppure crea account</small>
+                     </Link>
+                     </div>
                   </div>
                 </form>
-              </div>
-            </div>
-            <div className="flex flex-wrap mt-6 relative">
-              <div className="w-1/2"></div>
-              <div className="w-1/2 text-right">
-                <Link to="/auth/register" className="text-blueGray-200">
-                  <small>Create new account</small>
-                </Link>
               </div>
             </div>
           </div>

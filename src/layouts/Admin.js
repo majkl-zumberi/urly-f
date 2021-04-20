@@ -7,8 +7,6 @@ import React, { useEffect, useState } from "react";
 import { Redirect, Switch } from "react-router-dom";
 // views
 import Dashboard from "views/admin/Dashboard.js";
-import Maps from "views/admin/Maps.js";
-import Settings from "views/admin/Settings.js";
 import Tables from "views/admin/Tables.js";
 //guards
 import GuardedRouteAdmin from "../guards/GuardedRouteAdmin";
@@ -41,7 +39,6 @@ export default function Admin() {
         clicks:totalClicks[0].totalClicksAverageRounded+'',
         mostused:mostusedDevice
       });
-      console.log({stats});
     };
     fetchData();
   },[])
@@ -55,8 +52,6 @@ export default function Admin() {
         <div className="px-4 md:px-10 mx-auto w-full -m-24">
           <Switch>
             <GuardedRouteAdmin path='/admin/dashboard' exact component={Dashboard} auth={isAdmin}/>
-            <GuardedRouteAdmin path='/admin/maps' exact component={Maps} auth={isAdmin}/>
-            <GuardedRouteAdmin path='/admin/settings' exact component={Settings} auth={isAdmin}/>
             <GuardedRouteAdmin path='/admin/tables' exact component={Tables} auth={isAdmin}/>
             <Redirect from="/admin" to="/admin/dashboard" />
           </Switch>

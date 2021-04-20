@@ -10,6 +10,8 @@ import http from '../../http/http';
 export default function Dashboard() {
   const [datasets,setDatasets]= useState(undefined)
   const [datasetsBar,setDatasetsBar]= useState(undefined) // for barChart
+  const [links,setLinks]= useState([]);
+  const [devices,setDevices]= useState([])
   useEffect(() =>{
     async function fetchData(){
       try{
@@ -19,9 +21,13 @@ export default function Dashboard() {
       };
         const {data} = await http.get("/short-url/statistics",config);
         const {data:deviceStatistics} = await http.get("/short-url/statistics/devices",config);
+        const {data:links} = await http.get("/short-url/limit/5",config);
+        const {data:devices} = await http.get("/short-url/statistics/devices/mostused",config);
         console.log({data})
         setDatasets(data);
         setDatasetsBar(deviceStatistics);
+        setLinks(links);
+        setDevices(devices);
       } catch(e){
         console.log(e);
       }
@@ -85,17 +91,14 @@ export default function Dashboard() {
           {!!datasetsBar && (
             <CardBarChart datasets={formatDatasetBarStatistics(datasetsBar)} labels={formatLabelsBarStatistics(datasetsBar)}/>
           )}
-          {!!datasetsBar && 
-            console.log(formatLabelsBarStatistics(datasetsBar))
-          }
         </div>
       </div>
       <div className="flex flex-wrap mt-4">
         <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4">
-          <CardPageVisits />
+          <CardPageVisits links={links}/>
         </div>
         <div className="w-full xl:w-4/12 px-4">
-          <CardSocialTraffic />
+          <CardSocialTraffic devices={devices}/>
         </div>
       </div>
     </>

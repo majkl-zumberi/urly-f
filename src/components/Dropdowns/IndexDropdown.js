@@ -1,8 +1,8 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import { createPopper } from "@popperjs/core";
-
+import React from "react";
+import { Link, useHistory } from "react-router-dom";
 const IndexDropdown = () => {
+  const history = useHistory();
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
@@ -16,6 +16,44 @@ const IndexDropdown = () => {
   const closeDropdownPopover = () => {
     setDropdownPopoverShow(false);
   };
+  const logout= ()=>{
+    sessionStorage.removeItem("userSession")
+    sessionStorage.removeItem("isAdmin")
+    history.push({
+      pathname: '/',
+  });
+  }
+  const isAdmin=!!sessionStorage.getItem("userSession") && !!JSON.parse(sessionStorage.getItem("isAdmin"));
+  const renderAuthLoginLogout=()=>{
+    if(!(!!sessionStorage.getItem("userSession"))){
+      return (
+        <>
+        <Link
+          to="/auth/login"
+          className={
+            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+          }
+        >
+          Login
+        </Link>
+        <Link
+          to="/auth/register"
+          className={
+            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+          }
+        >
+          Registrati
+        </Link>
+        </>
+      )
+    } else {
+      return (
+        <a href="#logout" className={
+          "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+        } onClick={()=>logout()}>Logout</a>
+      )
+    }
+  }
   return (
     <>
       <a
@@ -27,7 +65,7 @@ const IndexDropdown = () => {
           dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover();
         }}
       >
-        Demo Pages
+        Urly panel
       </a>
       <div
         ref={popoverDropdownRef}
@@ -36,12 +74,14 @@ const IndexDropdown = () => {
           "bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
         }
       >
-        <span
+        {isAdmin && (
+          <>
+          <span
           className={
             "text-sm pt-2 pb-0 px-4 font-bold block w-full whitespace-nowrap bg-transparent text-blueGray-400"
           }
         >
-          Admin Layout
+          Admin
         </span>
         <Link
           to="/admin/dashboard"
@@ -50,57 +90,23 @@ const IndexDropdown = () => {
           Dashboard
         </Link>
         <Link
-          to="/admin/settings"
-          className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-        >
-          Settings
-        </Link>
-        <Link
           to="/admin/tables"
           className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
         >
-          Tables
+          Links Accorciati
         </Link>
-        <Link
-          to="/admin/maps"
-          className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-        >
-          Maps
-        </Link>
+          </>
+        )}
         <div className="h-0 mx-4 my-2 border border-solid border-blueGray-100" />
         <span
           className={
             "text-sm pt-2 pb-0 px-4 font-bold block w-full whitespace-nowrap bg-transparent text-blueGray-400"
           }
         >
-          Auth Layout
+          Autenticazione
         </span>
-        <Link
-          to="/auth/login"
-          className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-        >
-          Login
-        </Link>
-        <Link
-          to="/auth/register"
-          className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-        >
-          Register
-        </Link>
+        {renderAuthLoginLogout()}
         <div className="h-0 mx-4 my-2 border border-solid border-blueGray-100" />
-        <span
-          className={
-            "text-sm pt-2 pb-0 px-4 font-bold block w-full whitespace-nowrap bg-transparent text-blueGray-400"
-          }
-        >
-          No Layout
-        </span>
-        <Link
-          to="/profile"
-          className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-        >
-          Profile
-        </Link>
       </div>
     </>
   );
