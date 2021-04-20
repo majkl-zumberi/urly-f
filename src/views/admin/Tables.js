@@ -16,12 +16,11 @@ export default function Tables() {
     fetchData();
   },[fetchData])
   const deleteLink = async(id) =>{
-    console.log("elimino ",id);
     const bToken= `Bearer ${sessionStorage.getItem('userSession')}`;
         const config = {
           headers: { Authorization: bToken }
       };
-    const data = await http.delete(`/short-url/${id}`,config);
+     await http.delete(`/short-url/${id}`,config);
     fetchData()
   }
   return (

@@ -86,7 +86,7 @@ export default function CardLineChart({datasets,labels}) {
     };
     var ctx = document.getElementById("line-chart").getContext("2d");
     window.myLine = new Chart(ctx, config);
-  }, []);
+  }, [datasets,labels]);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-blueGray-700">

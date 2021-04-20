@@ -72,7 +72,7 @@ export default function CardBarChart({datasets,labels}) {
     };
     let ctx = document.getElementById("bar-chart").getContext("2d");
     window.myBar = new Chart(ctx, config);
-  }, []);
+  }, [datasets,labels]);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">

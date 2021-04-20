@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useEffect} from 'react'
 import {useParams, useHistory} from "react-router-dom";
 import http from "../http/http";
